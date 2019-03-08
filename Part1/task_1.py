@@ -4,9 +4,11 @@ from pyspark.context import SparkContext
 
 sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
 
-albums = sc.textFile("/Users/fridastrandkristoffersen/Downloads/datasets/albums.csv")
+#initializing the album
+#albums1 = sc.textFile("/Users/fridastrandkristoffersen/Downloads/datasets/albums.csv").map(lambda line: line.split(","))
+albums2 = sc.textFile("/Users/haraldaarskog/Google\ Drive/Workspace/git/BigDataGit/datasets/albums.csv ").map(lambda line: line.split(","))
+genre = albums2.map(lambda x: x[3])
 
-albumsmap = albums.map(lambda line: line.split(","))
-genre = albumsmap.map(lambda x: x[3])
 print(genre.distinct().collect())
+
 print(genre.distinct().count())
