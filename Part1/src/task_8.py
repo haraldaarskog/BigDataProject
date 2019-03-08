@@ -13,7 +13,7 @@ artists = sc.textFile("/Users/haraldaarskog/Google\ Drive/Big\ data-arkitektur/P
 artistmap= artists.map(lambda line: line.split(","))
 artistmap2 = artistmap.map(lambda x: (int(x[0]), (x[2])))
 
-joined = albumslist2.join(artistmap2).map(lambda x: x[1][1]).distinct()
+#joined = albumslist2.join(artistmap2).map(lambda x: x[1][1]).distinct()
 
 joined.coalesce(1).saveAsTextFile("result_88.tsv")
 

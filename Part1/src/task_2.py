@@ -4,9 +4,17 @@ from pyspark.context import SparkContext
 
 sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
 
-artists = sc.textFile("/Users/fridastrandkristoffersen/Downloads/datasets/artists.csv")
-artistmap = artists.map(lambda line: line.split(","))
-birthdate = artistmap.map(lambda x: x[4]).map(int)
-rdd1 = birthdate.sortBy(lambda x: x, True)
+#Loading the artists into a RDD and also splitting on "," for each element in the original file.
+#artists = sc.textFile("/Users/fridastrandkristoffersen/Downloads/datasets/artists.csv").map(lambda line: line.split(","))
+artists = sc.textFile("/Users/haraldaarskog/Google\ Drive/Workspace/git/BigDataGit/datasets/artists.csv").map(lambda line: line.split(","))
 
-print(rdd1.take(1))
+#Selecting the birth dates from the data set
+birthDates = artists.map(lambda x: int(x[4]))
+
+#Sorting the birth dates by ascending order
+birthDates_sorted = birthDates.sortBy(lambda x: x, True)
+
+#Taking out the element on top in which has the lowest birth date
+print(birthDates_sorted.take(1))
+
+#Output: 1955
