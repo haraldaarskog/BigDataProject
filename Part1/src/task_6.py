@@ -4,19 +4,15 @@ from pyspark.context import SparkContext
 
 sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
 
-albums = sc.textFile("/Users/fridastrandkristoffersen/Downloads/datasets/albums.csv")
+#Loading dataset
+albums = sc.textFile("/Users/haraldaarskog/Google\ Drive/Workspace/git/BigDataGit/datasets/albums.csv").map(lambda line: line.split(","))
 
-albumslist = albums.map(lambda line: line.split(","))
-albumslist2 = albumslist.map(lambda x: ((x[0]), (float(x[7])+float(x[8])+float(x[9]))/3))
-rdd2 = albumslist2.sortBy(lambda x: (x[1], x[0]), False)
+#Calculating the average critic for each album ID
+album_critic = albums.map(lambda x: ((x[0]), (float(x[7])+float(x[8])+float(x[9]))/3))
+#sorting on critics
+album_critic_sorted = album_critic.sortBy(lambda x: x[1], False)
+#Taking out the top 10 albums with highest average critic and transforming it into a RDD
+album_top10=sc.parallelize(album_critic_sorted.take(10)).map(lambda x: x[0]+"\t"+str(x[1]))
 
-rdd3=sc.parallelize(rdd2.take(10))
-#gjør om lista til en rdd
-
-rdd3.coalesce(1).saveAsTextFile("result_6.tsv")
-
-""""
-rdd1 = albumslist2.reduceByKey(lambda n, m: n+m)
-rdd2 = rdd1.sortBy(lambda x: (x[1], x[0]), False)
-
-"""
+#saving to text file
+album_top10.coalesce(1).saveAsTextFile("/Users/haraldaarskog/Google Drive/Workspace/git/BigDataGit/Part1/Output/result_6")
