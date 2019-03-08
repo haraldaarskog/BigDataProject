@@ -1,1 +1,1 @@
-Big Data ProjectJA
+Big Data Project
