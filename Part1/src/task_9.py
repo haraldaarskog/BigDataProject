@@ -5,12 +5,12 @@ from pyspark.context import SparkContext
 sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
 
 #loading the albums dataset
-albums = sc.textFile("/Users/haraldaarskog/Google\ Drive/Big\ data-arkitektur/Prosjekt/datasets/albums.csv").map(lambda line: line.split(","))
+albums = sc.textFile("/datasets/albums.csv").map(lambda line: line.split(","))
 #selecting artist ID and MTV critic from each row. Adding a value of 1 in order to later aggregate the elements
 albumslist = albums.map(lambda x: (int(x[1]),(float(x[8]), 1)))
 
 #loading the artists dataset
-artists = sc.textFile("/Users/haraldaarskog/Google\ Drive/Big\ data-arkitektur/Prosjekt/datasets/artists.csv")
+artists = sc.textFile("/datasets/artists.csv")
 #selecting all the Norwegian artists
 artists_norway= artists.map(lambda line: line.split(",")).filter(lambda x: x[5]=="Norway")
 #replacing artistsName like "" with the real name of the artists
@@ -33,4 +33,4 @@ countRatingJoin=rating2.join(count2)
 artistJoin=countRatingJoin.join(artistName).map(lambda x: (x[1][1],"Norway",x[1][0][0]/x[1][0][1])).sortBy(lambda x: x[0], True).sortBy(lambda x: x[2], False)
 artistJoin_tsv = artistJoin.map(lambda x: x[0]+"\t"+x[1]+"\t"+str(x[2]))
 #Writing to text file
-artistJoin_tsv.coalesce(1).saveAsTextFile("/Users/haraldaarskog/Google Drive/Workspace/git/BigDataGit/Part1/Output/result_9")
+artistJoin_tsv.coalesce(1).saveAsTextFile("/Output/result_9")
