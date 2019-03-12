@@ -5,7 +5,7 @@ from pyspark.context import SparkContext
 sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
 
 #loading the dataset into a RDD and also splitting every line on ",", making a two dimensional array
-albums = sc.textFile("/Users/haraldaarskog/Google\ Drive/Workspace/git/BigDataGit/datasets/albums.csv").map(lambda line: line.split(","))
+albums = sc.textFile("/datasets/albums.csv").map(lambda line: line.split(","))
 
 #Selecting only the genres into a new rdd
 genres = albums.map(lambda x: x[3])
