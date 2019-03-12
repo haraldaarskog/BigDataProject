@@ -13,12 +13,14 @@ sqlc=SQLContext(sc)
 album_df = sqlc.read.csv("/Users/haraldaarskog/Google\ Drive/Big\ data-arkitektur/Prosjekt/datasets/albums.csv")
 album_df2 = album_df.toDF("id","artist_id","album_title","genre","year_of_pub",\
 "num_of_tracks","num_of_sales","rolling_stone_critic","mtv_critic","music_maniac_critic")
+
 #Registering the dataframe as a table
 sqlc.registerDataFrameAsTable(album_df2, "albumTable")
 
 #Loading the artist dataset and converting it to a dataframe
 artist_df = sqlc.read.csv("/Users/haraldaarskog/Google\ Drive/Big\ data-arkitektur/Prosjekt/datasets/artists.csv")
 artist_df2 = artist_df.toDF("id","real_name","art_name","role","year_of_birth","country","city","email","zip_code")
+
 #Registering the dataframe as a table
 sqlc.registerDataFrameAsTable(artist_df2, "artistTable")
 
