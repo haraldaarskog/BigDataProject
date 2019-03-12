@@ -16,4 +16,4 @@ total_country_count = country_count.reduceByKey(lambda n, m: n+m)
 sorted_country_count = total_country_count.sortBy(lambda x: x[1], False).map(lambda x: x[0]+"\t"+str(x[1]))
 
 #Saving the sorted_country_count into a text file
-sorted_country_count.coalesce(1).saveAsTextFile("/Users/haraldaarskog/Google Drive/Workspace/git/BigDataGit/Part1/Output/result_3")
+sorted_country_count.coalesce(1).saveAsTextFile("/Output/result_3")
