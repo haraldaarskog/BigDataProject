@@ -6,6 +6,7 @@ sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
 
 #Loading the artists into a RDD and also splitting on "," for each element in the original file.
 artists = sc.textFile("/datasets/artists.csv").map(lambda line: line.split(","))
+
 #Adding a key-value pair for each instance in the rdd. Each instance get a value of 1.
 country_count = artists.map(lambda x: (x[5], 1))
 
