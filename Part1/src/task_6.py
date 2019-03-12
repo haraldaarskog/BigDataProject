@@ -5,7 +5,7 @@ from pyspark.context import SparkContext
 sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
 
 #Loading dataset
-albums = sc.textFile("/Users/haraldaarskog/Google\ Drive/Workspace/git/BigDataGit/datasets/albums.csv").map(lambda line: line.split(","))
+albums = sc.textFile("/datasets/albums.csv").map(lambda line: line.split(","))
 
 #Calculating the average critic for each album ID
 album_critic = albums.map(lambda x: ((x[0]), (float(x[7])+float(x[8])+float(x[9]))/3))
@@ -15,4 +15,4 @@ album_critic_sorted = album_critic.sortBy(lambda x: x[1], False)
 album_top10=sc.parallelize(album_critic_sorted.take(10)).map(lambda x: x[0]+"\t"+str(x[1]))
 
 #saving to text file
-album_top10.coalesce(1).saveAsTextFile("/Users/haraldaarskog/Google Drive/Workspace/git/BigDataGit/Part1/Output/result_6")
+album_top10.coalesce(1).saveAsTextFile("/Output/result_6")
