@@ -33,8 +33,12 @@ def recommend(user, k, file, output):
     corp6=corp5.reduceByKey(lambda n,m: n+m)
     compare2=corp6.sortBy(lambda x: x[0], True).sortBy(lambda x: x[1], False)
 
-    x = sc.parallelize(compare2.take(k)).map(lambda x: x[0]+"\t"+str(x[1]))
-    x.coalesce(1).saveAsTextFile(output)
+    x=compare2.zipWithIndex()
+    xx=x.filter(lambda key : key[1] < k and key[1] >=0)
+    xxx=xx.map(lambda x: x[0][0]+"\t"+str(x[0][1]))
+    xxx.coalesce(1).saveAsTextFile(output)
+    
+  #  x = sc.parallelize(compare2.take(k)).map(lambda x: x[0]+"\t"+str(x[1]))
 
 recommend("rachele_m13", 5, "tweets.tsv", "output.tsv")
 end = time.time()
