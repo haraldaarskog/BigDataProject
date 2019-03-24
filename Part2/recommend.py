@@ -1,42 +1,42 @@
 import pyspark as py
 from pyspark import SparkConf
 from pyspark.context import SparkContext
-from operator import add
-import time
-start = time.time()
-
 
 def recommend(user, k, file, output):
-    #Loading dataset
+
+    #Setting up the sparkContext
     sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
-    tweets = sc.textFile(file)
 
-    #Splitting dataset on tab and mapping in key-value pair:(user(word))
-    tweets2=tweets.map(lambda line: line.split("\t")).flatMapValues(lambda x: x.split(' ')).map(lambda x: (x[0],(x[1])))
-    #flatMapping the values and splitting on space, remapping to key-value pair
+    #loading tweets from file
+    tweetFile = sc.textFile(file)
 
-    #filtering out the input user and tweets not in the tweets of the user. Then mapping in key-value pair: ((user, word), 1)
-    corp777=tweets2.map(lambda x: ((x[0],x[1]),1))
+    #Splitting the dataset on tab and mapping in key-value pairs in the following way: ((user,word),1)
+    tweets=tweetFile.map(lambda line: line.split("\t")).flatMapValues(lambda x: x.split(' ')).map(lambda x: ((x[0],x[1]),1))
 
-    userTweet=corp777.filter(lambda x: x[0][0]==user).reduceByKey(lambda n,m:n+m).map(lambda x: (x[0][1],x[1])).collectAsMap()
+    #filtering out the input user and making a dictionairy with the count for every unique word in the tweets of the user
+    userTweetDictionairy=tweets.filter(lambda x: x[0][0]==user).reduceByKey(lambda n,m:n+m).map(lambda x: (x[0][1],x[1])).collectAsMap()
 
-    corp100=corp777.filter(lambda x: x[0][0]!=user and x[0][1] in userTweet)
+    #filtering out the input user and every word not in the the tweets of the user
+    filteredTweets=tweets.filter(lambda x: x[0][0]!=user and x[0][1] in userTweetDictionairy)
 
-    #reducing
-    corp4=corp100.reduceByKey(lambda n,m: n+m)
+    #counting every (user, word)-key
+    tweetCount=filteredTweets.reduceByKey(lambda n,m: n+m)
 
-    #finding the minimum frequency
-    corp5=corp4.map(lambda x: (x[0][0], min(userTweet[x[0][1]],x[1])))
+    #comparing each word frquency against the word frequency for the inputuser and choosing the minimum value
+    #Then mapping to (user, count)
+    tweetsCompared=tweetCount.map(lambda x: (x[0][0], min(userTweetDictionairy[x[0][1]],x[1])))
 
+    #summing up all the word frequecies for every user
+    tweetCount2=tweetsCompared.reduceByKey(lambda n,m: n+m)
 
-    corp6=corp5.reduceByKey(lambda n,m: n+m)
-    compare2=corp6.sortBy(lambda x: x[0], True).sortBy(lambda x: x[1], False)
+    #sorting on frequency in descending order, and username in ascending order
+    tweetsSorted=tweetCount2.sortBy(lambda x: x[0], True).sortBy(lambda x: x[1], False)
 
-    x=compare2.zipWithIndex()
-    xx=x.filter(lambda key : key[1] < k and key[1] >=0)
-    xxx=xx.map(lambda x: x[0][0]+"\t"+str(x[0][1]))
-    xxx.coalesce(1).saveAsTextFile(output)
+    #indexing every element in the rdd and filtering out the keys given in the input
+    indexedTweets=tweetsSorted.zipWithIndex().filter(lambda key : key[1] < k and key[1] >=0)
 
-recommend("rachele_m13", 5, "tweets.tsv", "output44.tsv")
-end = time.time()
-print(end - start)
+    #inserting tabs and saving as text file
+    indexedTweets.map(lambda x: x[0][0]+"\t"+str(x[0][1])).coalesce(1).saveAsTextFile(output)
+
+recommend("rachele_m13", 5, "tweets.tsv", "output000.tsv")
+#recommend("mary",3,"example.tsv","output1234.tsv")
