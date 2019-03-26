@@ -2,6 +2,11 @@ import pyspark as py
 from pyspark import SparkConf
 from pyspark.context import SparkContext
 
+user=input("User: \n")
+k=int(input("k: \n"))
+file=input("File: \n")
+output=input("output: \n")
+
 def recommend(user, k, file, output):
 
     #Setting up the sparkContext
@@ -38,5 +43,5 @@ def recommend(user, k, file, output):
     #inserting tabs and saving as text file
     indexedTweets.map(lambda x: x[0][0]+"\t"+str(x[0][1])).coalesce(1).saveAsTextFile(output)
 
-recommend("rachele_m13", 5, "tweets.tsv", "output000.tsv")
+recommend(user, k, file, output)
 #recommend("mary",3,"example.tsv","output1234.tsv")
